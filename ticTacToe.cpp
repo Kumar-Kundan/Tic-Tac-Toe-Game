@@ -5,7 +5,7 @@ class TicTacToe{
     char matrix[3][3];
     int x,y;
     public:
-    //initializing the matrix
+    //initializing the matrix with space
     TicTacToe(){
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
@@ -31,8 +31,9 @@ class TicTacToe{
     }
 
     //Getting the player turn
-    void getPlayerMove(){
+    void getPlayerMove(string player,char ch){
         int move;
+        cout<<player<<" to move: "<<endl;
         cout<<"Enter your position from 1 to 9 (row-wise counting)"<<endl;
         cin>>move;
 
@@ -60,16 +61,18 @@ class TicTacToe{
         //checking for valid move or not
         if(x==-1 || matrix[x][y]!=' '){
             cout<<"Invalid move, try again."<<endl;
-            getPlayerMove();
+            getPlayerMove(player,ch);
         }
         else{
-            matrix[x][y]='X';
+            matrix[x][y]=ch;
         }
     }
 
     //checking for winner
     char check(){
         //checking for rows
+        static int count=0;
+        count++;
         for(int i=0;i<3;++i){
             if(matrix[i][0]==matrix[i][1] && matrix[i][1]==matrix[i][2])
                return matrix[i][0];
@@ -86,6 +89,11 @@ class TicTacToe{
         if(matrix[0][2]==matrix[1][1] && matrix[1][1]==matrix[2][0])
             return matrix[0][2];
         //no winner
+        if(count>=9){
+            showMatrix();
+            cout<<"Match drawn!!!"<<endl;
+            exit(0);
+        }
         return ' ';
     }
     //getting computer turn
@@ -100,11 +108,6 @@ class TicTacToe{
                 }
             }
         }
-        //when all positions are filled
-        if(i*j==9){
-            cout<<"Match drawn!!!"<<endl;
-            exit(0);
-        }
     }
 };
 
@@ -115,12 +118,14 @@ class GameDriver{
         char done;
         do{
             startGame.showMatrix();
-            startGame.getPlayerMove();
+            //user move
+            startGame.getPlayerMove("Your",'X');
             done=startGame.check();
 
             if(done!=' ')   //winner found
                break;
 
+            //computer move
             startGame.getComputerMove();
             done=startGame.check();
 
@@ -139,8 +144,36 @@ class GameDriver{
         cout<<"Thank you!!"<<endl;
     }
     //for two players
-    void forTwoPlayer(){
-        ;
+    void forTwoPlayer(string player1="Player 1", string player2="Player 2"){
+        TicTacToe startGame;
+        char done;
+        do{
+            startGame.showMatrix();
+            //player 2 move
+            startGame.getPlayerMove(player1,'X');
+            done=startGame.check();
+
+            if(done!=' ')   //winner found
+               break;
+
+            startGame.showMatrix();
+            //player 2 move
+            startGame.getPlayerMove(player2,'O');
+            done=startGame.check();
+
+            if(done!=' ')  //winner found
+                break;     
+        }while(true);
+
+        //checking for who is winner
+        if(done=='X'){
+            cout<<player1<<" is winner!!!"<<endl;
+        }
+        else{
+            cout<<player2<<" is winner!!!"<<endl;
+        }
+        startGame.showMatrix();
+        cout<<"Thank you!!"<<endl;
     }
 };
 int main(){
@@ -162,8 +195,24 @@ int main(){
             obj.forOnePlayer();
             exit(0);
         case '2':
-            cout<<"IN WORK...."<<endl;
-            break;
+            char choice;
+            cout<<"do you want to enter your name(y|Y)"<<endl;
+            cin>>choice;
+
+            GameDriver obj1;
+            //user has unique names
+            if(choice=='y' || choice=='Y'){
+                string player1,player2;
+                cout<<"Enter your names:"<<endl;
+                cin>>player1>>player2;
+                //calling forTwoPlayer() function with their names
+                obj1.forTwoPlayer(player1,player2);
+            }
+            else{
+                //calling forTwoPlayer() function with no names
+                obj1.forTwoPlayer();
+            }
+            exit(0);
         default:
             cout<<"Invalid choice, try again."<<endl;
         }
